@@ -1,0 +1,263 @@
+	include "canon_x07.inc"
+
+	.org $2000
+
+MEV_WIDTH_BYTES		equ 16
+MEV_HEIGHT_BYTES	equ 32
+SCREEN_BUFFER_SIZE	equ MEV_WIDTH_BYTES*MEV_HEIGHT_BYTES
+
+SCREEN_WIDTH_PIXELS		equ 120
+SCREEN_HEIGHT_PIXELS	equ 32
+
+; --- World map size (in tiles) ---
+WORLD_W_TILES		equ 30
+WORLD_H_TILES		equ 16
+
+; --- Chunk size (screen in tiles) ---
+CHUNK_W_TILES		equ 15
+CHUNK_H_TILES		equ 4
+
+CHUNKS_X			equ 2
+CHUNKS_Y			equ 4
+
+CHUNK_Y_STRIDE		equ (WORLD_W_TILES*CHUNK_H_TILES)	; 120 tiles
+ROW_SKIP_AFTER_CHUNK	equ (WORLD_W_TILES-CHUNK_W_TILES)	; 15 tiles
+
+; --- Player movement step ---
+STEP_X				equ 8
+STEP_Y				equ 8
+
+TYPING_TICK_RELOAD	equ 64
+
+MAX_LEVEL			equ 99
+
+TYPING_RESULT_MISS		equ 0
+TYPING_RESULT_NORMAL	equ 1
+TYPING_RESULT_AMP		equ 2
+
+BATTLE_OUTCOME_NONE	equ 0
+BATTLE_OUTCOME_WIN		equ 1
+BATTLE_OUTCOME_FLEE	equ 2
+BATTLE_OUTCOME_LOSE	equ 3
+
+EVENT_TYPE_VILLAGE		equ 1
+EVENT_TYPE_BOSS		equ 2
+
+EVENT_FLAG_BOSS_CEMETERY	equ %00000001
+EVENT_FLAG_BOSS_FOREST	equ %00000010
+EVENT_FLAG_BOSS_RUINS	equ %00000100
+EVENT_FLAG_BOSS_OASIS	equ %00001000
+EVENT_FLAG_BOSS_TOWER	equ %00010000
+
+TILE_CASTLE_LEFT		equ 2
+TILE_CASTLE_RIGHT		equ 3
+SAVE_MAGIC_VALUE		equ $A7
+
+HOME_CHUNK_X			equ 0
+HOME_CHUNK_Y			equ 3
+HOME_PLAYER_X			equ 5*STEP_X
+HOME_PLAYER_Y			equ 1*STEP_Y
+
+BUILD_LANG_EN			equ 0 ; set to 1 for English build.
+
+INTRO_TEXT_PTR		equ intro_text
+DEBUG				equ 0
+
+; Debug values below are only applied when DEBUG = 1.
+	IF DEBUG
+DEBUG_SKIP_INTRO			equ 0
+DEBUG_SKIP_TITLE_SCREEN	equ 0
+DEBUG_SKIP_STARTUP_MUSIC	equ 0
+DEBUG_IMMORTAL			equ 1
+DEBUG_INITIAL_LEVEL		equ 20
+DEBUG_INITIAL_GOLD		equ 100
+DEBUG_INITIAL_FLAGS		equ 1
+DEBUG_SKIP_RANDOM_BATTLES	equ 1
+	ELSE
+DEBUG_SKIP_INTRO			equ 0
+DEBUG_SKIP_TITLE_SCREEN	equ 0
+DEBUG_SKIP_STARTUP_MUSIC	equ 0
+DEBUG_IMMORTAL			equ 0
+DEBUG_INITIAL_LEVEL		equ 1
+DEBUG_INITIAL_GOLD		equ 10
+DEBUG_INITIAL_FLAGS		equ 0
+DEBUG_SKIP_RANDOM_BATTLES	equ 0
+	ENDIF
+
+; ------------------------------------------------------------
+; Start
+; ------------------------------------------------------------
+
+start:
+	ld (saved_return_sp),sp
+	call music_capture_system_state
+	call ROM_LCD_CLS
+	ld a,T6834_CMD_CLICK_OFF
+	call ROM_T6834_CMD
+	ld a,T6834_CMD_KEYBUF_CLEAR
+	call ROM_T6834_CMD
+	ld a,T6834_CMD_CPUKEY_OUT_OFF
+	call ROM_T6834_CMD
+
+	IF DEBUG_SKIP_TITLE_SCREEN
+	IF DEBUG_SKIP_STARTUP_MUSIC
+	; keep startup silent in debug builds
+	ELSE
+	call music_start_map
+	ENDIF
+	call game_begin_from_title
+	ELSE
+	call title_show
+	or a
+	jp nz,quit
+	call game_begin_from_title
+	ENDIF
+	call world_redraw_map_with_player
+	IF DEBUG_SKIP_STARTUP_MUSIC
+	call music_start_map_late
+	ENDIF
+
+main:
+	; Quit if ON/BREAK
+	call game_break_poll_pending
+	jp nz,quit
+	ld a,(SYS_BREAKFLAG)
+	bit 7,a
+	jp nz,quit
+
+	ld a,(redraw_active)
+	or a
+	jr z,main_music_poll
+	call redraw_step
+	call game_break_pending
+	jp nz,quit
+	ld a,(redraw_active)
+	or a
+	call nz,redraw_step
+	call game_break_pending
+	jp nz,quit
+	ld a,(redraw_active)
+	or a
+	call nz,redraw_step
+	call game_break_pending
+	jp nz,quit
+	ld a,(redraw_active)
+	or a
+	call nz,redraw_step
+	call game_break_pending
+	jp nz,quit
+	call music_update
+	ld a,(redraw_active)
+	or a
+	jr nz,main
+	call draw_player
+	ld a,(post_move_pending)
+	or a
+	jr z,main
+	xor a
+	ld (post_move_pending),a
+	call check_tile_event
+	or a
+	jr nz,main
+	call check_random_battle
+	jr main
+
+main_music_poll:
+	call music_update
+	call world_poll_status_menu
+	or a
+	jr nz,main
+
+main_poll_input:
+	ld a,T6834_STICK_CMD
+	ld bc,1
+	ld de,SYS_T6834_REPLYBUF
+	call ROM_T6834_CMD_PARAM
+
+	ld a,(SYS_T6834_REPLYBUF)
+	cp T6834_STICK_NONE
+	jp z,main
+
+	xor a
+	ld (moved),a
+
+	; Interpret move (may change chunk)
+	ld a,(SYS_T6834_REPLYBUF)
+	cp T6834_STICK_LEFT
+	jr z,main_move_left
+	cp T6834_STICK_RIGHT
+	jr z,main_move_right
+	cp T6834_STICK_UP
+	jr z,main_move_up
+	cp T6834_STICK_DOWN
+	jr z,main_move_down
+	jr main_after_move
+
+main_move_left:
+	call move_left_chunk
+	jr main_after_move
+
+main_move_right:
+	call move_right_chunk
+	jr main_after_move
+
+main_move_up:
+	call move_up_chunk
+	jr main_after_move
+
+main_move_down:
+	call move_down_chunk
+
+main_after_move:
+moved	equ $+1
+	ld a,0
+	or a
+	jp z,main
+	ld a,(redraw_active)
+	or a
+	jp nz,main
+	call check_tile_event
+	or a
+	jp nz,main
+	call check_random_battle
+	jp main
+
+quit_cleanup:
+	di
+	xor a
+	ld (redraw_active),a
+	ld (music_render_active),a
+	ld (post_move_pending),a
+	call music_stop
+	call music_restore_system_state
+	ld a,T6834_CMD_KEYBUF_CLEAR
+	call ROM_T6834_CMD
+	ld a,T6834_CMD_CLICK_ON
+	call ROM_T6834_CMD
+	ld a,T6834_CMD_UDK_LABELS_OFF
+	call ROM_T6834_CMD
+	ld a,T6834_CMD_CURSOR_ON
+	call ROM_T6834_CMD
+	jp music_clear_breakflag
+
+quit:
+	call quit_cleanup
+	ld hl,(saved_return_sp)
+	ld sp,hl
+	ei
+	ret
+
+	include "movement.inc"
+	include "events.inc"
+	include "progression.inc"
+	include "music.inc"
+	include "typing.inc"
+	include "battle.inc"
+	include "menu.inc"
+	include "tilemapper.inc"
+	include "gfx.inc"
+	include "system.inc"
+	include "data.inc"
+	include "stats.inc"
+
+program_end:

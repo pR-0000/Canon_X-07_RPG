@@ -71,9 +71,8 @@ SYS_RAMEND             EQU $0212   ; end of file RAM area
 ; --- LCD “image mirror” (character-cell mirror, not pixel MEV screen) [DOC]
 SYS_LCD_MIRROR         EQU $0214   ; $0214..$0263
 
-SYS_INTIMAG				EQU $026C	; per system-zone dump
-
 ; --- T6834 communication scratch (used by BASIC; you can reuse if careful)
+SYS_INTIMAG				EQU $026C	; per system-zone dump
 SYS_T6834_NREPLY        EQU $026D   ; number of reply bytes expected
 SYS_T6834_REPLYBUF      EQU $026E   ; default reply buffer (1st)
 SYS_T6834_REPLYBUF2     EQU $0507   ; second reply buffer
@@ -163,6 +162,8 @@ ROM_LCD_PUTC_ALT          EQU $C1BA      ; [DOC] “display A at cursor and adva
 ROM_LCD_PUTC_RAW          EQU $C231      ; [DOC] H=X L=Y C=char, cursor immobile, MOD AF,BC,DE
 ROM_LCD_CLS               EQU $CE9E      ; [OK][DOC] clear screen (CLS)
 ROM_LCD_CURSOR_CTRL       EQU $C0A1      ; [DOC] A=0 show cursor, A=1 hide cursor
+ROM_COLOR                EQU $A637      ; [DOC] BASIC/ROM COLOR routine, A=color
+ROM_SCREEN_STATE         EQU $AB09      ; [DOC] screen/page state helper, D=active page E=visible page C=mode
 
 ; Useful display message routines (often used by BASIC)
 ROM_MSG_DISPLAY_SYS       EQU $D5B0      ; [DOC] display message (uses BASIC string area) HL->0/0D term
@@ -200,8 +201,20 @@ ROM_TIMER_INIT_15MIN      EQU $E327      ; [DOC] init 15-minute power timer, MOD
 ; 5) SOUND / BUZZER
 ; ============================================================
 
-ROM_BEEP                  EQU $C2DF      ; [OK][DOC] IY=pitch, H=duration, L=0
-ROM_SPK_CONTROL           EQU $C331      ; [DOC] IY=pitch, HL=duration, C=FF on / 00 off
+; Verified in BASIC.ROM with ROM base at $B000:
+; - ROM_BEEP at $C2DF is the callable ASM entry used by local music.z80
+; - ROM_SPK_CONTROL at $C331 is the low-level routine entered by ROM_BEEP
+; - the previous $D2xx/$D3xx hypothesis came from a wrong $C000 base assumption
+; - ROM_BEEP is not called like a normal ROM routine in ASM:
+;     push <continuation address>
+;     IY = note/pitch
+;     H  = duration
+;     L  = 0
+;     call ROM_BEEP
+;   The routine consumes the normal CALL return address and resumes at the
+;   continuation address that was manually pushed beforehand.
+ROM_BEEP                  EQU $C2DF      ; [ROM] ASM entry, special stack convention
+ROM_SPK_CONTROL           EQU $C331      ; [ROM] low-level speaker routine, not meant to be called directly
 
 
 ; ============================================================
@@ -215,6 +228,30 @@ ROM_LPT_SENDCHAR_FAST     EQU $CF11      ; [DOC] A=byte send to parallel access 
 
 ROM_IO_INIT_ALL           EQU $C39D      ; [DOC] init parallel/serial/opt/printer/cassette, MOD AF,BC,DE
 ROM_IO_STATUS_WAIT        EQU $CF7A      ; [DOC] wait BUSY low, tests OFF/BREAK/battery, MOD AF
+
+; Generic BASIC/ROM device layer used by INIT#/PRINT#/INPUT# and reusable from ASM
+ROM_DEV_OPEN             EQU $E6A8      ; [DOC] open/init device slot
+                                          ;   In:  DE = device descriptor table (DEV_*_TABLE)
+                                          ;        IY = slot in SYS_KBNTAB ($02C5 + 8*n)
+                                          ;        A  = device/file index (usually 0 for #1 slot example code)
+                                          ;        For COM only: B = ACIA mode letter, IX = baud divisor/value
+                                          ;   Ex: DE=DEV_COM_TABLE, IY=SYS_KBNTAB, A=0, B="B", IX=&1200
+                                          ;   Used in book examples for CASI/CASO/COM/GPR/KBD.
+
+ROM_DEV_ASSIGN           EQU $E827      ; [DOC] assign current input/output device from opened slot
+                                          ;   In: DE = slot base in SYS_KBNTAB ($02C5, $02CD, ...)
+                                          ;   Selects which previously opened device is the current target
+                                          ;   for subsequent generic ROM I/O calls such as E88F/E8D4.
+
+ROM_DEV_GETC             EQU $E8D4      ; [DOC] read one byte/char from current assigned device
+                                          ;   Out: A = byte received
+                                          ;   Notes: book examples use it for CASI and COM; for keyboard/serial
+                                          ;   it only returns when a byte is available. Includes ABORT handling.
+                                          ;   For cassette input, documentation notes C and Z set together can
+                                          ;   signal an I/O/loading error.
+
+ROM_DEV_PUTC             EQU $E88F      ; [DOC] write one byte/char in A to current assigned device
+                                          ;   Same routine used behind RST 28 ($0028).
 
 
 ; ============================================================
@@ -455,7 +492,7 @@ F6R_TXRDY               EQU $01           ; TX ready
 ; [DOC]/[ROM] list (not all validated).
 
 ROM_ABS                EQU $C9DC        ; [DOC]
-ROM_BEEP_BASIC          EQU $C2CD        ; [DOC] BASIC BEEP (wrapper vs ROM_BEEP)
+ROM_BEEP_BASIC          EQU $C2CC        ; [ROM] BASIC BEEP wrapper/parser
 ROM_CINT               EQU $CAE0        ; [DOC]
 ROM_CSNG               EQU $CB08        ; [DOC]
 ROM_CDBL               EQU $CB90        ; [DOC]
@@ -500,6 +537,7 @@ ROM_CINT_RTN            EQU $CAE0        ; [DOC] float->int (CINT) modifies all 
 ROM_CSNG_RTN            EQU $CB08        ; [DOC] convert to single precision
 ROM_CSNG_FROM_INT       EQU $CB1E        ; [DOC]
 ROM_CDBL_RTN            EQU $CB90        ; [DOC] convert to double precision
+ROM_FPACC_TO_BCDE       EQU $CA26        ; [DOC] transfer BASIC numeric accumulator (single precision) to BC/DE
 
 ; --- ASCII -> binary
 ROM_ATOI_INT            EQU $F595        ; [DOC] HL->string, DE=result
@@ -554,6 +592,12 @@ ROM_INT_PART            EQU $CC23        ; [DOC] INT()
 
 RST18_T6834_NOPARAM      EQU $C937        ; [DOC] (routine behind RST 18)
 RST28_DEV_PUTC           EQU $E88F        ; [DOC] (routine behind RST 28)
+
+; Common aliases matching the generic ROM device layer names
+ROM_IO_OPEN_DEVICE       EQU ROM_DEV_OPEN
+ROM_IO_ASSIGN_DEVICE     EQU ROM_DEV_ASSIGN
+ROM_IO_GETCHAR           EQU ROM_DEV_GETC
+ROM_IO_PUTCHAR           EQU ROM_DEV_PUTC
 
 
 ; ============================================================

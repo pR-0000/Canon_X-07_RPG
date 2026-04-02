@@ -1,131 +1,169 @@
-# Canon X-07 RPG (Z80)
+# Canon X-07 Quest
+
+![Titlescreen](./titlescreen.png.png)
+
+![Screenshots](./screenshots.png)
 
 ## 🇫🇷 Français
 
-Petit RPG programmé en assembleur Z80 à destination de l’ordinateur de poche **Canon X-07**.
+### Présentation
+`Canon X-07 Quest` est un mini-RPG en assembleur Z80 pour l’ordinateur de poche Canon X-07.
 
-Le projet vise à exploiter les capacités graphiques, le clavier et le contrôleur LCD (T6834) du X-07 pour proposer un mini-RPG complet en environnement 8-bit.
+Le joueur incarne un héros envoyé par le roi pour retrouver un sorcier en fuite. L’aventure commence près du château, puis traverse le cimetière, la forêt, les ruines, l’oasis et enfin la tour noire.
 
----
+Le jeu propose une musique monophonique, une carte de 30x16 cases à explorer, 7 types d’ennemis différents, 7 lieux à visiter et environ une bonne heure de jeu.
+
+Le jeu a été réalisé dans le cadre de la Game Jam Retro Programmers United for Obscure Systems, session Canon X-07 de 2026 :
+[https://itch.io/jam/rpufos-canon-x07](https://itch.io/jam/rpufos-canon-x07)
+
+Le projet a été développé avec l’aide de ChatGPT 5.4.
+
+### Matériel requis
+Une puce d’extension RAM de 8 ko est obligatoire.
+
+Modèles testés :
+- `Toshiba TC5565PL-15`
+- `Toshiba TC5565APL-10L`
+- ou tout équivalent compatible
+
+### Chargement
+Le jeu doit être chargé à l’adresse mémoire :
+
+```text
+$2000
+```
+
+Le chargement par liaison série est recommandé avec ce projet :
+[Canon X-07 Serial Fast Loader](https://github.com/pR-0000/Canon-X-07-Serial-Fast-Loader)
+
+Configuration recommandée :
+- charger le loader à l’adresse `$1F00`
+- charger ensuite `quest_FR.bin` ou `quest_EN.bin` à l’adresse `$2000`
 
 ### Compilation
+Le fichier source principal est `quest.z80`.
 
-Il est recommandé d’assembler le projet avec **sjasmplus** :
+Assemblage recommandé avec `sjasmplus` :
 
 ```bash
-sjasmplus --raw=rpg.bin rpg.z80
+sjasmplus --raw=quest_FR.bin quest.z80
 ```
 
-Cela génère un binaire brut `rpg.bin`.
+Pour une version anglaise, régler `BUILD_LANG_EN equ 1` dans `quest.z80`, puis assembler par exemple :
 
----
-
-### Chargement en mémoire
-
-Le binaire doit être injecté à l’adresse :
-
-```
-0x2000
+```bash
+sjasmplus --raw=quest_EN.bin quest.z80
 ```
 
-C’est le début de la mémoire RAM additionnelle de 8 ko.
+### Commandes
+- Flèches directionnelles : déplacer le héros et déplacer le curseur dans les menus
+- `F6` : valider
+- `DEL` : annuler
+- Clavier `QWERTY` : saisir les mots pendant les combats
+- `BREAK` : quitter le jeu et revenir au BASIC lorsque le joueur se trouve sur la carte
 
-⚠️ Si vous souhaitez utiliser une autre adresse, il faudra adapter le code source en conséquence.
+### Histoire
+Le roi charge le héros de poursuivre un sorcier qui a fui le royaume. Pour le retrouver, il faudra explorer plusieurs régions, vaincre les gardiens qui protègent sa fuite et progresser jusqu’à la tour noire où se déroule l’affrontement final.
 
----
+### Système de combat
+Les combats sont aléatoires sur la carte, à l’exception des boss.
 
-### Fichier `canon_x07.inc`
+Lors d’une attaque, un défi de frappe apparaît. Le joueur doit retaper rapidement le mot affiché pour obtenir un bonus de dégâts :
+- réussite normale : petit bonus
+- réussite rapide : bonus plus fort
+- échec : aucun bonus
 
-Le fichier `canon_x07.inc` contient les définitions des constantes, appels ROM et structures système.
+Le jeu mélange donc progression RPG, équipement et rapidité de frappe.
 
-Il peut être complété si nécessaire.
-Il est principalement basé sur la documentation technique disponible pour le Canon X-07.
+### Remarque sur l’affichage
+Certains Canon X-07 sont connus pour avoir un affichage légèrement plus lent que d’autres. Dans ce cas, le contrôleur LCD T6834 peut parfois interférer avec certaines écritures graphiques très rapides, ce qui provoque quelques glitchs visuels ponctuels ou des octets d’écran mal copiés.
 
----
+Ces artefacts restent rares, n’affectent pas la sauvegarde, et n’ont normalement pas de conséquence sur le gameplay.
 
-### Déjà implémenté
+### Sauvegarde
+La progression est sauvegardée automatiquement pendant l’aventure.
 
-* Routines graphiques (buffer écran + blit vers LCD)
-* Gestion map / tiles
-* Tilemapper par "chunks" (pas de scrolling continu, affichage trop lent)
-* Système de menus
-* Déclenchement aléatoire des combats
-* Base du système de combat
-
----
-
-### TODO
-
-* Collisions du tilemapper
-* Gestion des événements / dialogues
-* Gestion complète des stats joueur / ennemis
-* Finaliser le système de combats
-* Ajouter du son / de la musique
-* Gestion des sauvegardes
-* Si possible, résoudre le problème d’octets non copiés à l’écran par le T6834
+Si vous souhaitez recommencer une partie totalement neuve, le plus simple est de recharger proprement le programme et de repartir sans ancienne sauvegarde.
 
 ---
 
 ## 🇬🇧 English
 
-A small RPG written in Z80 assembly for the **Canon X-07** pocket computer.
+### Overview
+`Canon X-07 Quest` is a small Z80 assembly RPG for the Canon X-07 pocket computer.
 
-This project aims to leverage the graphical capabilities, keyboard, and LCD controller (T6834) of the X-07 to create a complete mini-RPG in an 8-bit environment.
+You play a hero sent by the king to track down a fleeing sorcerer. The adventure begins near the castle, then continues through the graveyard, the forest, the ruins, the oasis, and finally the black tower.
 
----
+The game features monophonic music, a 30x16-tile world map to explore, 7 enemy types, 7 places to visit, and roughly one good hour of playtime.
 
-### Compilation
+The game was created for the Retro Programmers United for Obscure Systems Game Jam, Canon X-07 2026 session:
+[https://itch.io/jam/rpufos-canon-x07](https://itch.io/jam/rpufos-canon-x07)
 
-It is recommended to assemble the project using **sjasmplus**:
+The project was developed with the help of ChatGPT 5.4.
+
+### Hardware Requirements
+An 8 KB RAM expansion chip is mandatory.
+
+Tested models:
+- `Toshiba TC5565PL-15`
+- `Toshiba TC5565APL-10L`
+- or any compatible equivalent
+
+### Loading
+The game must be loaded at:
+
+```text
+$2000
+```
+
+Serial loading is recommended with this project:
+[Canon X-07 Serial Fast Loader](https://github.com/pR-0000/Canon-X-07-Serial-Fast-Loader)
+
+Recommended setup:
+- load the loader at `$1F00`
+- then load `quest_FR.bin` or `quest_EN.bin` at `$2000`
+
+### Build
+The main source file is `quest.z80`.
+
+Recommended assembly command with `sjasmplus`:
 
 ```bash
-sjasmplus --raw=rpg.bin rpg.z80
+sjasmplus --raw=quest_FR.bin quest.z80
 ```
 
-This generates a raw binary file named `rpg.bin`.
+For an English build, set `BUILD_LANG_EN equ 1` in `quest.z80`, then assemble for example:
 
----
-
-### Memory Loading
-
-The binary must be injected at address:
-
-```
-0x2000
+```bash
+sjasmplus --raw=quest_EN.bin quest.z80
 ```
 
-This corresponds to the beginning of the 8 KB additional RAM.
+### Controls
+- Direction keys: move the hero and move the cursor in menus
+- `F6`: confirm
+- `DEL`: cancel
+- `QWERTY` keyboard: type words during battles
+- `BREAK`: quit the game and return to BASIC while the player is on the world map
 
-⚠️ If you wish to use a different address, the source code must be modified accordingly.
+### Story
+The king sends the hero after a sorcerer who has fled the kingdom. To catch him, the player must explore several regions, defeat the guardians along his path, and eventually reach the black tower for the final battle.
 
----
+### Battle System
+Battles are random on the world map, except for bosses.
 
-### `canon_x07.inc` File
+During an attack, a typing challenge appears. The player must quickly type the displayed word to gain a damage bonus:
+- normal success: small bonus
+- fast success: stronger bonus
+- failure: no bonus
 
-The `canon_x07.inc` file contains constant definitions, ROM calls, and system structures.
+The game is built around a mix of RPG progression, equipment upgrades, and typing speed.
 
-It can be extended if necessary.
-It is primarily based on the available technical documentation for the Canon X-07.
+### Display Note
+Some Canon X-07 units are known to refresh the display a little more slowly than others. When this happens, the T6834 LCD controller can occasionally interfere with very fast graphic writes, which may result in minor visual glitches or a few display bytes being copied incorrectly.
 
----
+These glitches are only visual, do not affect saves, and should not impact gameplay.
 
-### Already Implemented
+### Save System
+Progress is saved automatically during the adventure.
 
-* Graphics routines (screen buffer + LCD blitting)
-* Map / tile handling
-* Chunk-based tilemapper (no smooth scrolling due to display speed limitations)
-* Menu system
-* Random battle triggering
-* Base battle system
-
----
-
-### TODO
-
-* Tilemapper collision handling
-* Event / dialogue system
-* Complete player and enemy stat management
-* Finalize the battle system
-* Add sound / music
-* Save system
-* If possible, fix the issue of bytes not being properly copied to the screen by the T6834
+If you want to start a completely fresh run, the simplest method is to reload the program cleanly and begin again without using an old save.
