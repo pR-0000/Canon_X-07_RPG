@@ -1,6 +1,6 @@
 # Canon X-07 Quest
 
-![Titlescreen](./titlescreen.png.png)
+![Titlescreen](./titlescreen.png)
 
 ![Screenshots](./screenshots.png)
 
