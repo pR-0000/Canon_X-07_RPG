@@ -40,6 +40,12 @@ Configuration recommandée :
 - charger le loader à l’adresse `$1F00`
 - charger ensuite `quest_FR.bin` ou `quest_EN.bin` à l’adresse `$2000`
 
+Sans le loader, après avoir chargé le jeu à l’adresse `$2000`, il faut lancer :
+
+```basic
+EXEC&H2000
+```
+
 ### Compilation
 Le fichier source principal est `quest.z80`.
 
@@ -58,7 +64,7 @@ sjasmplus --raw=quest_EN.bin quest.z80
 ### Commandes
 - Flèches directionnelles : déplacer le héros et déplacer le curseur dans les menus
 - `F6` : valider
-- `DEL` : annuler
+- `DEL` : annuler, et ouvrir le menu de statistiques du héros sur la carte
 - Clavier `QWERTY` : saisir les mots pendant les combats
 - `BREAK` : quitter le jeu et revenir au BASIC lorsque le joueur se trouve sur la carte
 
@@ -72,6 +78,8 @@ Lors d’une attaque, un défi de frappe apparaît. Le joueur doit retaper rapid
 - réussite normale : petit bonus
 - réussite rapide : bonus plus fort
 - échec : aucun bonus
+
+Le joueur peut se soigner dans les auberges, acheter des potions pour récupérer des PV pendant les combats, ou utiliser de la fumée pour s’enfuir à coup sûr.
 
 Le jeu mélange donc progression RPG, équipement et rapidité de frappe.
 
@@ -123,6 +131,12 @@ Recommended setup:
 - load the loader at `$1F00`
 - then load `quest_FR.bin` or `quest_EN.bin` at `$2000`
 
+Without the loader, after loading the game at `$2000`, start it with:
+
+```basic
+EXEC&H2000
+```
+
 ### Build
 The main source file is `quest.z80`.
 
@@ -141,7 +155,7 @@ sjasmplus --raw=quest_EN.bin quest.z80
 ### Controls
 - Direction keys: move the hero and move the cursor in menus
 - `F6`: confirm
-- `DEL`: cancel
+- `DEL`: cancel, and open the hero status menu on the world map
 - `QWERTY` keyboard: type words during battles
 - `BREAK`: quit the game and return to BASIC while the player is on the world map
 
@@ -155,6 +169,8 @@ During an attack, a typing challenge appears. The player must quickly type the d
 - normal success: small bonus
 - fast success: stronger bonus
 - failure: no bonus
+
+The hero can recover at inns, buy potions to heal during battles, or use smoke to flee with a guaranteed escape.
 
 The game is built around a mix of RPG progression, equipment upgrades, and typing speed.
 
