@@ -89,6 +89,9 @@ DEBUG_SKIP_RANDOM_BATTLES	equ 0
 ; ------------------------------------------------------------
 
 start:
+	xor a
+	ld (music_driver_installed),a
+	call music_reset_runtime_state
 	ld (saved_return_sp),sp
 	call music_capture_system_state
 	call ROM_LCD_CLS

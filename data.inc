@@ -73,6 +73,58 @@ save_event_flags	equ save_inventory_smokes+1
 save_player_exp		equ save_event_flags+1
 save_player_gold	equ save_player_exp+2
 
+enemy_ptr_table:
+	.dw enemy_slime
+	.dw enemy_fantome
+	.dw enemy_araignee
+	.dw enemy_bandit_ruins
+	.dw enemy_bandit_tower
+	.dw enemy_squelette
+	.dw enemy_bandit_boss
+	.dw enemy_demon_ruins
+	.dw enemy_demon_oasis
+	.dw enemy_sorcier
+
+enemy_slime:
+	.db 16,7,1,1,4,4
+	.dw enemy_name_slime
+
+enemy_fantome:
+	.db 17,13,3,2,6,6
+	.dw enemy_name_fantome
+
+enemy_araignee:
+	.db 19,18,4,2,8,8
+	.dw enemy_name_araignee
+
+enemy_bandit_ruins:
+	.db 20,28,6,3,12,12
+	.dw enemy_name_bandit
+
+enemy_bandit_tower:
+	.db 20,40,8,4,16,16
+	.dw enemy_name_bandit
+
+enemy_squelette:
+	.db 18,20,8,3,24,24
+	.dw enemy_name_squelette
+
+enemy_bandit_boss:
+	.db 20,56,11,5,40,40
+	.dw enemy_name_bandit
+
+enemy_demon_ruins:
+	.db 21,80,13,6,64,60
+	.dw enemy_name_demon
+
+enemy_demon_oasis:
+	.db 21,106,16,8,88,80
+	.dw enemy_name_demon
+
+enemy_sorcier:
+	.db 22,140,18,10,128,120
+	.dw enemy_name_sorcier
+
 ; ------------------------------------------------------------
 ; Music data
 ; pair8 format
@@ -393,6 +445,53 @@ menu_castle_shop:
 	.db 2,3,13,"Blade+1 48G",0
 	.db 2,4,13,"Armor+1 48G",0
 
+typing_group_ptrs:
+	.dw typing_group_0
+	.dw typing_group_1
+	.dw typing_group_2
+	.dw typing_group_3
+
+typing_group_0:
+	.dw typing_word_blow
+	.dw typing_word_rush
+	.dw typing_word_slam
+	.dw typing_word_stab
+
+typing_group_1:
+	.dw typing_word_strike
+	.dw typing_word_charge
+	.dw typing_word_thrust
+	.dw typing_word_clash
+
+typing_group_2:
+	.dw typing_word_assault
+	.dw typing_word_advance
+	.dw typing_word_rampage
+	.dw typing_word_crush
+
+typing_group_3:
+	.dw typing_word_onslaught
+	.dw typing_word_devastate
+	.dw typing_word_overpower
+	.dw typing_word_annihilate
+
+typing_word_blow:	.db "BLOW",0
+typing_word_rush:	.db "RUSH",0
+typing_word_slam:	.db "SLAM",0
+typing_word_stab:	.db "STAB",0
+typing_word_strike:	.db "STRIKE",0
+typing_word_charge:	.db "CHARGE",0
+typing_word_thrust:	.db "THRUST",0
+typing_word_clash:	.db "CLASH",0
+typing_word_assault:	.db "ASSAULT",0
+typing_word_advance:	.db "ADVANCE",0
+typing_word_rampage:	.db "RAMPAGE",0
+typing_word_crush:	.db "CRUSH",0
+typing_word_onslaught:	.db "ONSLAUGHT",0
+typing_word_devastate:	.db "DEVASTATE",0
+typing_word_overpower:	.db "OVERPOWER",0
+typing_word_annihilate:	.db "ANNIHILATE",0
+
 intro_text:
 	.db "The king says:",13
 	.db "- The sorcerer fled",13
@@ -488,53 +587,6 @@ msg_village_0:
 msg_village_1:
 	.db "Tower southeast.",0
 
-typing_group_ptrs:
-	.dw typing_group_0
-	.dw typing_group_1
-	.dw typing_group_2
-	.dw typing_group_3
-
-typing_group_0:
-	.dw typing_word_blow
-	.dw typing_word_rush
-	.dw typing_word_slam
-	.dw typing_word_stab
-
-typing_group_1:
-	.dw typing_word_strike
-	.dw typing_word_charge
-	.dw typing_word_thrust
-	.dw typing_word_clash
-
-typing_group_2:
-	.dw typing_word_assault
-	.dw typing_word_advance
-	.dw typing_word_rampage
-	.dw typing_word_crush
-
-typing_group_3:
-	.dw typing_word_onslaught
-	.dw typing_word_devastate
-	.dw typing_word_overpower
-	.dw typing_word_annihilate
-
-typing_word_blow:	.db "BLOW",0
-typing_word_rush:	.db "RUSH",0
-typing_word_slam:	.db "SLAM",0
-typing_word_stab:	.db "STAB",0
-typing_word_strike:	.db "STRIKE",0
-typing_word_charge:	.db "CHARGE",0
-typing_word_thrust:	.db "THRUST",0
-typing_word_clash:	.db "CLASH",0
-typing_word_assault:	.db "ASSAULT",0
-typing_word_advance:	.db "ADVANCE",0
-typing_word_rampage:	.db "RAMPAGE",0
-typing_word_crush:	.db "CRUSH",0
-typing_word_onslaught:	.db "ONSLAUGHT",0
-typing_word_devastate:	.db "DEVASTATE",0
-typing_word_overpower:	.db "OVERPOWER",0
-typing_word_annihilate:	.db "ANNIHILATE",0
-
 	ELSE
 menu_battle:	; number of options, jump addresses, coordinates (X, Y), zero-terminated string length+1, zero-terminated string
 	.db 3
@@ -602,6 +654,53 @@ menu_castle_shop:
 	.db 2,2,11,"Fum",CHAR_E_ACUTE,"e 22o",0
 	.db 2,3,12,CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e+1 48o",0
 	.db 2,4,14,"Armure+1 48o",0
+
+typing_group_ptrs:
+	.dw typing_group_0
+	.dw typing_group_1
+	.dw typing_group_2
+	.dw typing_group_3
+
+typing_group_0:
+	.dw typing_word_coup
+	.dw typing_word_choc
+	.dw typing_word_rage
+	.dw typing_word_elan
+
+typing_group_1:
+	.dw typing_word_assaut
+	.dw typing_word_charge
+	.dw typing_word_frappe
+	.dw typing_word_ruade
+
+typing_group_2:
+	.dw typing_word_attaque
+	.dw typing_word_bagarre
+	.dw typing_word_poussee
+	.dw typing_word_percee
+
+typing_group_3:
+	.dw typing_word_offensive
+	.dw typing_word_bousculade
+	.dw typing_word_massacrer
+	.dw typing_word_fulgurant
+
+typing_word_coup:	.db "COUP",0
+typing_word_choc:	.db "CHOC",0
+typing_word_rage:	.db "RAGE",0
+typing_word_elan:	.db "ELAN",0
+typing_word_assaut:	.db "ASSAUT",0
+typing_word_charge:	.db "CHARGE",0
+typing_word_frappe:	.db "FRAPPE",0
+typing_word_ruade:	.db "RUADE",0
+typing_word_attaque:	.db "ATTAQUE",0
+typing_word_bagarre:	.db "BAGARRE",0
+typing_word_poussee:	.db "POUSSEE",0
+typing_word_percee:	.db "PERCEE",0
+typing_word_offensive:	.db "OFFENSIVE",0
+typing_word_bousculade:	.db "BOUSCULADE",0
+typing_word_massacrer:	.db "MASSACRER",0
+typing_word_fulgurant:	.db "FULGURANT",0
 
 intro_text:
 	.db "Le roi dit :",13
@@ -697,52 +796,5 @@ msg_village_0:
 	.db "Ruines ",CHAR_A_GRAVE," l'est.",13,"Oasis loin ",CHAR_A_GRAVE," l'est.",0
 msg_village_1:
 	.db "Tour au sud-est.",0
-
-typing_group_ptrs:
-	.dw typing_group_0
-	.dw typing_group_1
-	.dw typing_group_2
-	.dw typing_group_3
-
-typing_group_0:
-	.dw typing_word_coup
-	.dw typing_word_choc
-	.dw typing_word_rage
-	.dw typing_word_elan
-
-typing_group_1:
-	.dw typing_word_assaut
-	.dw typing_word_charge
-	.dw typing_word_frappe
-	.dw typing_word_ruade
-
-typing_group_2:
-	.dw typing_word_attaque
-	.dw typing_word_bagarre
-	.dw typing_word_poussee
-	.dw typing_word_percee
-
-typing_group_3:
-	.dw typing_word_offensive
-	.dw typing_word_bousculade
-	.dw typing_word_massacrer
-	.dw typing_word_fulgurant
-
-typing_word_coup:	.db "COUP",0
-typing_word_choc:	.db "CHOC",0
-typing_word_rage:	.db "RAGE",0
-typing_word_elan:	.db "ELAN",0
-typing_word_assaut:	.db "ASSAUT",0
-typing_word_charge:	.db "CHARGE",0
-typing_word_frappe:	.db "FRAPPE",0
-typing_word_ruade:	.db "RUADE",0
-typing_word_attaque:	.db "ATTAQUE",0
-typing_word_bagarre:	.db "BAGARRE",0
-typing_word_poussee:	.db "POUSSEE",0
-typing_word_percee:	.db "PERCEE",0
-typing_word_offensive:	.db "OFFENSIVE",0
-typing_word_bousculade:	.db "BOUSCULADE",0
-typing_word_massacrer:	.db "MASSACRER",0
-typing_word_fulgurant:	.db "FULGURANT",0
 
 	ENDIF
