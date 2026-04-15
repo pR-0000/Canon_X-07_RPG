@@ -35,14 +35,14 @@ menu_draw_options:
 	inc hl
 	push bc
 	push hl
-	inc hl	; skip string length
 	ld (SYS_CURSOR_XY),de
 	call ROM_MSG_DISPLAY_NOSTR
 	pop hl
-	ld d,0
+menu_draw_options_skip_string:
 	ld a,(hl)
-	ld e,a
-	add hl,de
+	inc hl
+	or a
+	jr nz,menu_draw_options_skip_string
 	pop bc
 	djnz menu_draw_options
 	call menu_draw_cursor
@@ -196,10 +196,11 @@ menu_draw_cursor_at_index:
 menu_draw_cursor_skip_index:
 	inc hl		; x
 	inc hl		; y
-	ld d,0
-	ld a,(hl)	; len
-	ld e,a
-	add hl,de	; skip string+0 (len includes 0)
+menu_draw_cursor_skip_string:
+	ld a,(hl)
+	inc hl
+	or a
+	jr nz,menu_draw_cursor_skip_string
 	djnz menu_draw_cursor_skip_index
 
 menu_draw_cursor_done:

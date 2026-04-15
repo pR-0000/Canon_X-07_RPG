@@ -58,7 +58,7 @@ HOME_CHUNK_Y			equ 3
 HOME_PLAYER_X			equ 5*STEP_X
 HOME_PLAYER_Y			equ 1*STEP_Y
 
-BUILD_LANG_EN			equ 0 ; set to 1 for English build.
+BUILD_LANG_EN			equ 1 ; set to 1 for English build.
 
 INTRO_TEXT_PTR		equ intro_text
 DEBUG				equ 0
@@ -117,7 +117,7 @@ start:
 	ENDIF
 	call world_redraw_map_with_player
 	IF DEBUG_SKIP_STARTUP_MUSIC
-	call music_start_map_late
+	call music_start_map
 	ENDIF
 
 main:

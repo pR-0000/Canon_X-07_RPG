@@ -33,8 +33,7 @@ typing_word_len		equ typing_word_ptr+2
 typing_index		equ typing_word_len+1
 typing_timeout		equ typing_index+1
 typing_bonus_limit	equ typing_timeout+1
-typing_early_limit	equ typing_bonus_limit+1
-typing_result		equ typing_early_limit+1
+typing_result		equ typing_bonus_limit+1
 typing_last_key		equ typing_result+1
 typing_tick_div		equ typing_last_key+1
 typing_word_x		equ typing_tick_div+1

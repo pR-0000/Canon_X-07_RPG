@@ -159,26 +159,16 @@ progress_zone_tower:
 progress_select_random_enemy:
 	call progress_get_current_chunk_zone
 	dec a
-	ld e,a
-	ld d,0
-	ld hl,encounter_enemy_ids
-	add hl,de
-	ld a,(hl)
-	jp progress_load_enemy_from_id
-
-encounter_enemy_ids:
-	.db 0,1,2,3,4
+	jr progress_load_enemy_from_id
 
 progress_load_enemy_from_id:
 	add a,a
+	add a,a
+	add a,a
 	ld e,a
 	ld d,0
-	ld hl,enemy_ptr_table
+	ld hl,enemy_slime
 	add hl,de
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	ex de,hl
 	ld a,(hl)
 	ld (battle_enemy_tile),a
 	inc hl
@@ -251,7 +241,8 @@ progress_level_up_loop:
 progress_get_level_threshold:
 	ld a,(player_level)
 	ld b,a
-	add a,7
+	add a,a
+	add a,8
 	ld c,a
 	ld hl,0
 	ld d,0

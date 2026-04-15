@@ -73,56 +73,44 @@ save_event_flags	equ save_inventory_smokes+1
 save_player_exp		equ save_event_flags+1
 save_player_gold	equ save_player_exp+2
 
-enemy_ptr_table:
-	.dw enemy_slime
-	.dw enemy_fantome
-	.dw enemy_araignee
-	.dw enemy_bandit_ruins
-	.dw enemy_bandit_tower
-	.dw enemy_squelette
-	.dw enemy_bandit_boss
-	.dw enemy_demon_ruins
-	.dw enemy_demon_oasis
-	.dw enemy_sorcier
-
 enemy_slime:
-	.db 16,7,1,1,4,4
+	.db 16,10,3,10,4,7
 	.dw enemy_name_slime
 
 enemy_fantome:
-	.db 17,13,3,2,6,6
+	.db 17,18,5,11,6,10
 	.dw enemy_name_fantome
 
 enemy_araignee:
-	.db 19,18,4,2,8,8
+	.db 19,22,6,12,8,13
 	.dw enemy_name_araignee
 
 enemy_bandit_ruins:
-	.db 20,28,6,3,12,12
+	.db 20,36,8,13,12,18
 	.dw enemy_name_bandit
 
 enemy_bandit_tower:
-	.db 20,40,8,4,16,16
+	.db 20,48,9,15,16,22
 	.dw enemy_name_bandit
 
 enemy_squelette:
-	.db 18,20,8,3,24,24
+	.db 18,28,8,12,24,36
 	.dw enemy_name_squelette
 
 enemy_bandit_boss:
-	.db 20,56,11,5,40,40
+	.db 20,72,12,16,40,60
 	.dw enemy_name_bandit
 
 enemy_demon_ruins:
-	.db 21,80,13,6,64,60
+	.db 21,96,14,18,64,84
 	.dw enemy_name_demon
 
 enemy_demon_oasis:
-	.db 21,106,16,8,88,80
+	.db 21,120,16,20,88,108
 	.dw enemy_name_demon
 
 enemy_sorcier:
-	.db 22,140,18,10,128,120
+	.db 22,160,20,22,128,160
 	.dw enemy_name_sorcier
 
 ; ------------------------------------------------------------
@@ -371,30 +359,30 @@ menu_title:
 	.db 2
 	.dw title_menu_continue
 	.dw title_menu_quit
-	.db 8,3,8," CONT.",0
-	.db 8,4,8," QUIT.",0
+	.db 8,3," CONT.",0
+	.db 8,4," QUIT.",0
 
 msg_hp_clear:
 	.db "   ",0
 
 	IF BUILD_LANG_EN
-menu_battle:	; number of options, jump addresses, coordinates (X, Y), zero-terminated string length+1, zero-terminated string
+menu_battle:	; number of options, jump addresses, coordinates (X, Y), zero-terminated string
 	.db 3
 	.dw battle_attack
 	.dw battle_show_objects_menu
 	.dw battle_flee
-	.db 5,4,5,"Atk",0
-	.db 10,4,5,"Obj",0
-	.db 15,4,6,"Flee",0
+	.db 5,4,"Atk",0
+	.db 10,4,"Obj",0
+	.db 15,4,"Flee",0
 
 menu_objects:
 	.db 2
 	.dw battle_use_potion
 	.dw battle_use_smoke
-	.db 4,3,12,"Potion("
+	.db 4,3,"Potion("
 menu_obj_potion_count:
 	.db "0","0",")",0
-	.db 4,4,11,"Smoke("
+	.db 4,4,"Smoke("
 menu_obj_smoke_count:
 	.db "0","0",")",0
 
@@ -403,9 +391,9 @@ menu_village:
 	.dw village_talk
 	.dw village_rest
 	.dw village_shop_menu_enter
-	.db 3,2,11,"Villagers",0
-	.db 3,3,5,"Inn",0
-	.db 3,4,6,"Shop",0
+	.db 3,2,"Talk",0
+	.db 3,3,"Inn",0
+	.db 3,4,"Shop",0
 
 menu_village_shop:
 	.db 4
@@ -413,26 +401,26 @@ menu_village_shop:
 	.dw shop_buy_smoke
 	.dw shop_buy_blade
 	.dw shop_buy_armor
-	.db 2,1,12,"Potion 22G",0
-	.db 2,2,11,"Smoke 32G",0
-	.db 2,3,14,"Blade+3 144G",0
-	.db 2,4,14,"Armor+3 144G",0
+	.db 2,1,"Potion 22G",0
+	.db 2,2,"Smoke 32G",0
+	.db 2,3,"Blade+3 144G",0
+	.db 2,4,"Arm.+3 144G",0
 
 menu_castle:
 	.db 3
 	.dw castle_palace
 	.dw castle_inn_menu_enter
 	.dw castle_shop_menu_enter
-	.db 3,1,6,"King",0
-	.db 3,2,5,"Inn",0
-	.db 3,3,6,"Shop",0
+	.db 3,1,"King",0
+	.db 3,2,"Inn",0
+	.db 3,3,"Shop",0
 
 menu_castle_inn:
 	.db 2
 	.dw castle_inn_yes
 	.dw inn_reenter
-	.db 3,3,5,"Yes",0
-	.db 3,4,4,"No",0
+	.db 3,3,"Yes",0
+	.db 3,4,"No",0
 
 menu_castle_shop:
 	.db 4
@@ -440,36 +428,24 @@ menu_castle_shop:
 	.dw shop_buy_smoke
 	.dw shop_buy_blade
 	.dw shop_buy_armor
-	.db 2,1,12,"Potion 14G",0
-	.db 2,2,11,"Smoke 22G",0
-	.db 2,3,13,"Blade+1 48G",0
-	.db 2,4,13,"Armor+1 48G",0
+	.db 2,1,"Potion 14G",0
+	.db 2,2,"Smoke 22G",0
+	.db 2,3,"Blade+1 48G",0
+	.db 2,4,"Arm.+1 48G",0
 
-typing_group_ptrs:
-	.dw typing_group_0
-	.dw typing_group_1
-	.dw typing_group_2
-	.dw typing_group_3
-
-typing_group_0:
+typing_word_ptrs:
 	.dw typing_word_blow
 	.dw typing_word_rush
 	.dw typing_word_slam
 	.dw typing_word_stab
-
-typing_group_1:
 	.dw typing_word_strike
 	.dw typing_word_charge
 	.dw typing_word_thrust
 	.dw typing_word_clash
-
-typing_group_2:
 	.dw typing_word_assault
 	.dw typing_word_advance
 	.dw typing_word_rampage
 	.dw typing_word_crush
-
-typing_group_3:
 	.dw typing_word_onslaught
 	.dw typing_word_devastate
 	.dw typing_word_overpower
@@ -492,22 +468,39 @@ typing_word_devastate:	.db "DEVASTATE",0
 typing_word_overpower:	.db "OVERPOWER",0
 typing_word_annihilate:	.db "ANNIHILATE",0
 
-intro_text:
-	.db "The king says:",13
-	.db "- The sorcerer fled",13
-	.db "to the graveyard.",13
-	.db "Go investigate.",0
+msg_no_potion:
+	.db "No potion",0
+msg_no_smoke:
+	.db "No smoke",0
+msg_full_hp:
+	.db "HP full",0
+msg_battle_intro:
+	.db "attacks!",0
+msg_victory:
+	.db "Victory!",0
+msg_level_up:
+	.db "LVL UP",0
+msg_damage_dealt:
+	.db "Hit",0
+msg_damage_taken:
+	.db "Took",0
+msg_gold_gain:
+	.db "Gold +",0
+msg_game_over:
+	.db "GAME OVER",0
+
+enemy_name_slime:	.db "SLIME",0
+enemy_name_fantome:	.db "GHOST",0
+enemy_name_araignee:	.db "SPIDER",0
+enemy_name_bandit:	.db "BANDIT",0
+enemy_name_squelette:	.db "SKELETON",0
+enemy_name_demon:	.db "DEMON",0
+enemy_name_sorcier:	.db "SORCERER",0
 
 msg_no_gold:
-	.db "Not enough gold",0
+	.db "Need gold",0
 msg_upgrade_owned:
 	.db "Already better",0
-msg_no_potion:
-	.db "No potion left",0
-msg_no_smoke:
-	.db "No smoke left",0
-msg_full_hp:
-	.db "HP already full",0
 msg_village:
 	.db "Village",0
 msg_castle:
@@ -522,49 +515,31 @@ msg_inn_offer_price:
 	.db "20"
 	.db "G?",0
 msg_status_title:
-	.db "Hero lv.",0
-msg_status_gold:
-	.db "G:",0
+	.db "Lv.",0
 msg_status_hp:
 	.db "HP",0
 msg_status_pot:
-	.db "Potion:",0
+	.db "Pot.",0
 msg_status_smoke:
-	.db "Smoke:",0
+	.db "Smk.",0
 msg_status_sword:
-	.db "Blade",0
+	.db "Bld.",0
 msg_status_shield:
-	.db "Shield",0
+	.db "Shld.",0
 msg_gold:
 	.db "G:",0
 msg_potions:
 	.db "Pot",0
 msg_smokes:
 	.db "Smk",0
-msg_battle_intro:
-	.db "wants to fight",0
-msg_victory:
-	.db "Victory!",0
-msg_level_up:
-	.db "LVL UP",0
-msg_damage_dealt:
-	.db "Hit",0
-msg_damage_taken:
-	.db "Took",0
-msg_gold_gain:
-	.db "Gold +",0
 msg_fin:
 	.db "END",0
-msg_game_over:
-	.db "GAME OVER",0
 
-enemy_name_slime:	.db "SLIME",0
-enemy_name_fantome:	.db "GHOST",0
-enemy_name_araignee:	.db "SPIDER",0
-enemy_name_bandit:	.db "BANDIT",0
-enemy_name_squelette:	.db "SKELETON",0
-enemy_name_demon:	.db "DEMON",0
-enemy_name_sorcier:	.db "SORCERER",0
+intro_text:
+	.db "The king says:",13
+	.db "- Sorcerer at",13
+	.db "graveyard.",13
+	.db "Go now.",0
 
 castle_king_msg_table:
 	.dw msg_king_1
@@ -574,37 +549,37 @@ castle_king_msg_table:
 	.dw msg_king_4
 
 msg_king_1:
-	.db "Go to the forest.",0
+	.db "Go forest.",0
 msg_king_2:
-	.db "Go to the ruins.",0
+	.db "Go ruins.",0
 msg_king_3:
-	.db "Go to the oasis.",0
+	.db "Go oasis.",0
 msg_king_4:
-	.db "Go to the black",13,"tower.",0
+	.db "Go black",13,"tower.",0
 
 msg_village_0:
-	.db "Ruins east.",13,"Oasis far east.",0
+	.db "Ruins east.",13,"Oasis east.",0
 msg_village_1:
-	.db "Tower southeast.",0
+	.db "Tower SE.",0
 
 	ELSE
-menu_battle:	; number of options, jump addresses, coordinates (X, Y), zero-terminated string length+1, zero-terminated string
+menu_battle:	; number of options, jump addresses, coordinates (X, Y), zero-terminated string
 	.db 3
 	.dw battle_attack
 	.dw battle_show_objects_menu
 	.dw battle_flee
-	.db 5,4,5,"Atq",0
-	.db 10,4,5,"Obj",0
-	.db 15,4,6,"Fuir",0
+	.db 5,4,"Atq",0
+	.db 10,4,"Obj",0
+	.db 15,4,"Fuir",0
 
 menu_objects:
 	.db 2
 	.dw battle_use_potion
 	.dw battle_use_smoke
-	.db 4,3,12,"Potion("
+	.db 4,3,"Potion("
 menu_obj_potion_count:
 	.db "0","0",")",0
-	.db 4,4,11,"Fum",CHAR_E_ACUTE,"e("
+	.db 4,4,"Fum",CHAR_E_ACUTE,"e("
 menu_obj_smoke_count:
 	.db "0","0",")",0
 
@@ -613,9 +588,9 @@ menu_village:
 	.dw village_talk
 	.dw village_rest
 	.dw village_shop_menu_enter
-	.db 3,2,12,"Villageois",0
-	.db 3,3,9,"Auberge",0
-	.db 3,4,9,"Magasin",0
+	.db 3,2,"Parler",0
+	.db 3,3,"Auberge",0
+	.db 3,4,"Magasin",0
 
 menu_village_shop:
 	.db 4
@@ -623,26 +598,26 @@ menu_village_shop:
 	.dw shop_buy_smoke
 	.dw shop_buy_blade
 	.dw shop_buy_armor
-	.db 2,1,12,"Potion 22o",0
-	.db 2,2,11,"Fum",CHAR_E_ACUTE,"e 32o",0
-	.db 2,3,13,CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e+3 144o",0
-	.db 2,4,15,"Armure+3 144o",0
+	.db 2,1,"Potion 22o",0
+	.db 2,2,"Fum",CHAR_E_ACUTE,"e 32o",0
+	.db 2,3,CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e+3 144o",0
+	.db 2,4,"Arm.+3 144o",0
 
 menu_castle:
 	.db 3
 	.dw castle_palace
 	.dw castle_inn_menu_enter
 	.dw castle_shop_menu_enter
-	.db 3,1,5,"Roi",0
-	.db 3,2,9,"Auberge",0
-	.db 3,3,9,"Magasin",0
+	.db 3,1,"Roi",0
+	.db 3,2,"Auberge",0
+	.db 3,3,"Magasin",0
 
 menu_castle_inn:
 	.db 2
 	.dw castle_inn_yes
 	.dw inn_reenter
-	.db 3,3,5,"Oui",0
-	.db 3,4,5,"Non",0
+	.db 3,3,"Oui",0
+	.db 3,4,"Non",0
 
 menu_castle_shop:
 	.db 4
@@ -650,36 +625,24 @@ menu_castle_shop:
 	.dw shop_buy_smoke
 	.dw shop_buy_blade
 	.dw shop_buy_armor
-	.db 2,1,12,"Potion 14o",0
-	.db 2,2,11,"Fum",CHAR_E_ACUTE,"e 22o",0
-	.db 2,3,12,CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e+1 48o",0
-	.db 2,4,14,"Armure+1 48o",0
+	.db 2,1,"Potion 14o",0
+	.db 2,2,"Fum",CHAR_E_ACUTE,"e 22o",0
+	.db 2,3,CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e+1 48o",0
+	.db 2,4,"Arm.+1 48o",0
 
-typing_group_ptrs:
-	.dw typing_group_0
-	.dw typing_group_1
-	.dw typing_group_2
-	.dw typing_group_3
-
-typing_group_0:
+typing_word_ptrs:
 	.dw typing_word_coup
 	.dw typing_word_choc
 	.dw typing_word_rage
 	.dw typing_word_elan
-
-typing_group_1:
 	.dw typing_word_assaut
 	.dw typing_word_charge
 	.dw typing_word_frappe
 	.dw typing_word_ruade
-
-typing_group_2:
 	.dw typing_word_attaque
 	.dw typing_word_bagarre
 	.dw typing_word_poussee
 	.dw typing_word_percee
-
-typing_group_3:
 	.dw typing_word_offensive
 	.dw typing_word_bousculade
 	.dw typing_word_massacrer
@@ -702,22 +665,39 @@ typing_word_bousculade:	.db "BOUSCULADE",0
 typing_word_massacrer:	.db "MASSACRER",0
 typing_word_fulgurant:	.db "FULGURANT",0
 
-intro_text:
-	.db "Le roi dit :",13
-	.db "- Le sorcier a fui",13
-	.db "vers le cimeti",CHAR_E_GRAVE,"re.",13
-	.db "Pars enqu",CHAR_E_CIRC,"ter.",0
+msg_no_potion:
+	.db "Potion vide",0
+msg_no_smoke:
+	.db "Fum",CHAR_E_ACUTE,"e:0",0
+msg_full_hp:
+	.db "PV max",0
+msg_battle_intro:
+	.db "attaque!",0
+msg_victory:
+	.db "Victoire!",0
+msg_level_up:
+	.db "NIVEAU+",0
+msg_damage_dealt:
+	.db "Infl.",0
+msg_damage_taken:
+	.db "Recu",0
+msg_gold_gain:
+	.db "Or +",0
+msg_game_over:
+	.db "GAME OVER",0
+
+enemy_name_slime:	.db "SLIME",0
+enemy_name_fantome:	.db "FANTOME",0
+enemy_name_araignee:	.db "ARAIGNEE",0
+enemy_name_bandit:	.db "BANDIT",0
+enemy_name_squelette:	.db "SQUELETTE",0
+enemy_name_demon:	.db "DEMON",0
+enemy_name_sorcier:	.db "SORCIER",0
 
 msg_no_gold:
-	.db "Or insuffisant",0
+	.db "Or manque",0
 msg_upgrade_owned:
 	.db "D",CHAR_E_ACUTE,"j",CHAR_A_GRAVE," ",CHAR_E_ACUTE,"quip",CHAR_E_ACUTE,0
-msg_no_potion:
-	.db "Plus de potion",0
-msg_no_smoke:
-	.db "Plus de fum",CHAR_E_ACUTE,"e",0
-msg_full_hp:
-	.db "Pv d",CHAR_E_ACUTE,"j",CHAR_A_GRAVE," pleins",0
 msg_village:
 	.db "Village",0
 msg_castle:
@@ -732,49 +712,31 @@ msg_inn_offer_price:
 	.db "20"
 	.db " or?",0
 msg_status_title:
-	.db "H",CHAR_E_ACUTE,"ros niv.",0
-msg_status_gold:
-	.db "Or:",0
+	.db "Niv.",0
 msg_status_hp:
 	.db "Pv",0
 msg_status_pot:
-	.db "Potion:",0
+	.db "Pot.",0
 msg_status_smoke:
-	.db "Fum",CHAR_E_ACUTE,"e:",0
+	.db "Fum.",0
 msg_status_sword:
-	.db CHAR_E_ACUTE,"p",CHAR_E_ACUTE,"e",0
+	.db CHAR_E_ACUTE,"p.",0
 msg_status_shield:
-	.db "Bouclier",0
+	.db "Bouc.",0
 msg_gold:
 	.db "Or:",0
 msg_potions:
 	.db "Pot",0
 msg_smokes:
 	.db "Fum",0
-msg_battle_intro:
-	.db "veut se battre",0
-msg_victory:
-	.db "Victoire!",0
-msg_level_up:
-	.db "NIVEAU+",0
-msg_damage_dealt:
-	.db "Infl.",0
-msg_damage_taken:
-	.db "Recu",0
-msg_gold_gain:
-	.db "Or +",0
 msg_fin:
 	.db "FIN",0
-msg_game_over:
-	.db "GAME OVER",0
 
-enemy_name_slime:	.db "SLIME",0
-enemy_name_fantome:	.db "FANTOME",0
-enemy_name_araignee:	.db "ARAIGNEE",0
-enemy_name_bandit:	.db "BANDIT",0
-enemy_name_squelette:	.db "SQUELETTE",0
-enemy_name_demon:	.db "DEMON",0
-enemy_name_sorcier:	.db "SORCIER",0
+intro_text:
+	.db "Le roi dit:",13
+	.db "- Sorcier au",13
+	.db "cimeti",CHAR_E_GRAVE,"re.",13
+	.db "Va voir.",0
 
 castle_king_msg_table:
 	.dw msg_king_1
@@ -784,17 +746,17 @@ castle_king_msg_table:
 	.dw msg_king_4
 
 msg_king_1:
-	.db "Va ",CHAR_A_CIRC," la for",CHAR_E_CIRC,"t.",0
+	.db "Va for",CHAR_E_CIRC,"t.",0
 msg_king_2:
-	.db "Va vers les ruines.",0
+	.db "Va ruines.",0
 msg_king_3:
-	.db "Va vers l'oasis.",0
+	.db "Va oasis.",0
 msg_king_4:
-	.db "Va vers la tour,",13,"noire.",0
+	.db "Va tour",13,"noire.",0
 
 msg_village_0:
-	.db "Ruines ",CHAR_A_GRAVE," l'est.",13,"Oasis loin ",CHAR_A_GRAVE," l'est.",0
+	.db "Ruines est.",13,"Oasis est.",0
 msg_village_1:
-	.db "Tour au sud-est.",0
+	.db "Tour SE.",0
 
 	ENDIF

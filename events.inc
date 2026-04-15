@@ -381,13 +381,13 @@ world_draw_shop_screen:
 	call world_clear_menu_screen
 	ld (SYS_CURSOR_XY),de
 	call ROM_MSG_DISPLAY_NOSTR
-	jp world_draw_gold_bottom_right
+	jr world_draw_gold_bottom_right
 
 world_draw_titled_screen:
 	call world_clear_menu_screen
 	ld (SYS_CURSOR_XY),de
 	call ROM_MSG_DISPLAY_NOSTR
-	jp world_draw_status_panel
+	jr world_draw_status_panel
 
 world_draw_gold_bottom_right:
 	ld hl,msg_gold
@@ -449,7 +449,7 @@ world_draw_status_screen:
 	ld d,11
 	ld e,1
 	call world_print_value_a
-	ld hl,msg_status_gold
+	ld hl,msg_gold
 	ld d,15
 	ld e,1
 	ld (SYS_CURSOR_XY),de
@@ -784,7 +784,8 @@ world_get_inn_cost_hl:
 	srl a
 	srl a
 	srl a
-	add a,10
+	srl a
+	add a,8
 	ld l,a
 	ld h,0
 	ret

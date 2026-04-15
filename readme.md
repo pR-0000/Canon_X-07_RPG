@@ -39,12 +39,15 @@ Le chargement par liaison série est recommandé avec ce projet :
 Configuration recommandée :
 - charger le loader à l’adresse `$1F00`
 - charger ensuite `quest_FR.bin` ou `quest_EN.bin` à l’adresse `$2000`
+- réserver un `RAM file` minimal avec `FSET 13` avant le chargement du jeu
 
 Sans le loader, après avoir chargé le jeu à l’adresse `$2000`, il faut lancer :
 
 ```basic
 EXEC&H2000
 ```
+
+Avec le loader série recommandé, cette réservation peut être faite automatiquement par le chargeur. Si vous utilisez une autre méthode, exécutez d’abord `FSET 13` avant de charger le jeu.
 
 ### Compilation
 Le fichier source principal est `quest.z80`.
@@ -93,6 +96,8 @@ La progression est sauvegardée automatiquement pendant l’aventure.
 
 Si vous souhaitez recommencer une partie totalement neuve, le plus simple est de recharger proprement le programme et de repartir sans ancienne sauvegarde.
 
+Cette réservation doit être faite par le chargeur ou manuellement avant le chargement.
+
 ---
 
 ## 🇬🇧 English
@@ -130,12 +135,15 @@ Serial loading is recommended with this project:
 Recommended setup:
 - load the loader at `$1F00`
 - then load `quest_FR.bin` or `quest_EN.bin` at `$2000`
+- reserve a minimal `RAM file` with `FSET 13` before loading the game
 
 Without the loader, after loading the game at `$2000`, start it with:
 
 ```basic
 EXEC&H2000
 ```
+
+With the recommended serial loader, this reservation can be handled automatically by the loader itself. If you use another loading method, run `FSET 13` before loading the game.
 
 ### Build
 The main source file is `quest.z80`.
@@ -183,3 +191,5 @@ These glitches are only visual, do not affect saves, and should not impact gamep
 Progress is saved automatically during the adventure.
 
 If you want to start a completely fresh run, the simplest method is to reload the program cleanly and begin again without using an old save.
+
+This reservation must be handled by the loader or entered manually before loading the game.

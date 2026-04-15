@@ -32,13 +32,6 @@ music_start_map:
 	call ROM_T6834_CMD
 	ld a,T6834_CMD_KEYBUF_CLEAR
 	call ROM_T6834_CMD
-	jr music_start_map_continue
-
-music_start_map_late:
-	ld a,(music_driver_installed)
-	or a
-	ret nz
-music_start_map_continue:
 	call music_clear_breakflag
 	ld a,(MUSIC_MAP_DATA)
 	cp $FF

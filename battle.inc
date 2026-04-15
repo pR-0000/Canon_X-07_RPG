@@ -47,7 +47,7 @@ battle:
 	ld (battle_enemy_hp_cur),a
 	call battle_draw_scene
 	call battle_show_intro
-	jp battle_show_menu
+	jr battle_show_menu
 
 battle_show_menu:
 	call battle_prepare_menu_ui
@@ -93,7 +93,7 @@ battle_draw_scene:
 
 battle_prepare_menu_ui:
 	call battle_refresh_status
-	jp battle_clear_bottom_rows
+	jr battle_clear_bottom_rows
 
 battle_refresh_status:
 	ld hl,msg_hp_clear
@@ -248,8 +248,27 @@ battle_use_potion_apply:
 	ld a,(inventory_potions)
 	dec a
 	ld (inventory_potions),a
+	ld a,(player_hp_max)
+	ld c,0
+battle_use_potion_div3_loop:
+	cp 3
+	jr c,battle_use_potion_div3_done
+	sub 3
+	inc c
+	jr battle_use_potion_div3_loop
+battle_use_potion_div3_done:
+	or a
+	jr z,battle_use_potion_div3_exact
+	inc c
+battle_use_potion_div3_exact:
+	ld a,c
+	or a
+	jr nz,battle_use_potion_amount_ready
+	inc a
+battle_use_potion_amount_ready:
+	ld b,a
 	ld a,(player_hp_cur)
-	add a,12
+	add a,b
 	ld b,a
 	ld a,(player_hp_max)
 	cp b
@@ -398,10 +417,10 @@ battle_calc_player_damage:
 	ld b,a
 	ld a,(player_level)
 	srl a
+	srl a
 	add a,b
 	ld b,a
 	ld a,(battle_enemy_def)
-	srl a
 	srl a
 	srl a
 	ld c,a
@@ -420,6 +439,7 @@ battle_enemy_turn:
 	ld b,a
 	ld a,(player_def)
 	ld c,a
+	srl c
 	srl c
 	ld a,b
 	sub c

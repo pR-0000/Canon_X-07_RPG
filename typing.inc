@@ -76,13 +76,6 @@ typing_process_key:
 	ld a,(hl)
 	cp b
 	jr z,typing_process_key_correct
-
-	ld a,(typing_index)
-	inc a
-	ld b,a
-	ld a,(typing_early_limit)
-	cp b
-	jr nc,typing_process_key_miss
 	jr typing_process_key_miss
 
 typing_process_key_miss:
@@ -145,22 +138,18 @@ typing_select_group_1:
 	ld a,3
 typing_select_group_ready:
 	add a,a
-	ld e,a
-	ld d,0
-	ld hl,typing_group_ptrs
-	add hl,de
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	ex de,hl
+	add a,a
+	ld c,a
 	call rng8
 	ld b,a
 	ld a,r
 	xor b
 	and $03
+	add a,c
 	add a,a
 	ld e,a
 	ld d,0
+	ld hl,typing_word_ptrs
 	add hl,de
 	ld e,(hl)
 	inc hl
@@ -197,24 +186,15 @@ typing_timeout_nonneg:
 	ld a,34
 typing_timeout_store:
 	ld (typing_timeout),a
-	sub 22
+	sub 30
 	jr nc,typing_bonus_nonneg
 	xor a
 typing_bonus_nonneg:
-	cp 16
+	cp 12
 	jr nc,typing_bonus_store
-	ld a,16
+	ld a,12
 typing_bonus_store:
 	ld (typing_bonus_limit),a
-
-	ld a,(typing_word_len)
-	dec a
-	ld e,a
-	ld d,0
-	ld hl,typing_early_limit_table
-	add hl,de
-	ld a,(hl)
-	ld (typing_early_limit),a
 	ret
 
 typing_flush_keys:
@@ -267,6 +247,3 @@ typing_normalize_key_uppercase_check:
 typing_normalize_key_invalid:
 	xor a
 	ret
-
-typing_early_limit_table:
-	.db 1,1,1,2,2,2,3,3,3,4
