@@ -323,7 +323,9 @@ world_menu_leave_to_map:
 	jp world_redraw_map_with_player
 
 world_poll_status_menu:
+	MAP_TRACE 4
 	call test_s1_keys
+	MAP_TRACE 5
 	bit 1,a	; DEL key ([DOC] S1/K2)
 	jr z,world_poll_status_menu_none
 	call world_wait_del_release

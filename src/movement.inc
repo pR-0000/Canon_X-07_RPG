@@ -147,13 +147,8 @@ world_try_target_move_apply:
 	jp music_update
 
 world_try_target_move_redraw:
-	call get_tile_sprite_under_player
-	call draw_sprite8_at_player_ix
 	call world_commit_target_position
-	call start_chunk_redraw
-	ld a,1
-	ld (post_move_pending),a
-	jp music_update
+	jp world_redraw_map_with_player
 
 world_commit_target_position:
 	ld a,(target_chunk_x)

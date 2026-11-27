@@ -32,15 +32,12 @@ saved_f4_mode		equ saved_return_sp+2
 music_tick_accum	equ saved_f4_mode+1
 music_note_active	equ music_tick_accum+1
 music_render_active	equ music_note_active+1
-redraw_active		equ music_render_active+1
-redraw_row		equ redraw_active+1
-redraw_subrow		equ redraw_row+1
-post_move_pending	equ redraw_subrow+1
 param_check_Fcnt_keys:	.db $00, $20
 param_check_S1_keys:	.db $00, $01
 param_line_clear_3:	.db 2
 param_line_clear_4:	.db 3
-rng_seed		equ post_move_pending+1
+; Leave the four former redraw bytes unused to preserve saved-game addresses.
+rng_seed		equ music_render_active+5
 encounter_cooldown	equ rng_seed+1
 
 ; Offsets in the 30x16 tile map for each visible 15x4 chunk

@@ -371,8 +371,8 @@ irq_serial_chain:
 	pop de
 	pop bc
 	pop af
-	ld hl,(saved_serial_vector+1)
-	jp (hl)
+	jp saved_serial_vector	; Execute the saved JP with interrupted HL intact.
+	nop			; Keep the rest of the release at the same addresses.
 
 music_service_bg1:
 	ld a,(music_tick_accum)

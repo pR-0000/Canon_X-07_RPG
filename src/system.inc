@@ -141,10 +141,6 @@ game_load_save:
 	ld (level_up_flag),a
 	ld (last_player_bonus),a
 	ld (encounter_cooldown),a
-	ld (post_move_pending),a
-	ld (redraw_active),a
-	ld (redraw_row),a
-	ld (redraw_subrow),a
 	ld hl,0
 	ld (battle_enemy_name_ptr),hl
 	ret
@@ -340,7 +336,9 @@ game_break_poll_pending:
 	ret
 
 world_redraw_map_with_player:
+	MAP_TRACE 1
 	call redraw_chunk
+	MAP_TRACE 2
 	jp draw_player
 
 battle_return_to_map:

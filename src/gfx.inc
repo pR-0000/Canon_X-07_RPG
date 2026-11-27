@@ -14,6 +14,7 @@ blit_loop_fast_burst:
 	inc de
 	push de
 	ld d,a
+blit_map_write_call:
 	call x_ram_write_fast_atomic
 	jr nz,blit_fast_burst_abort_write
 	pop de
@@ -40,7 +41,24 @@ blit_fast_burst_abort_write:
 blit_fast_burst_done:
 	jp music_render_end
 
+	IFNDEF QUEST_MAP_TRACE ; Uncalled differential blit leaves room for the probe.
 blit_buf_range_to_lcd_diff_once:
+	IFDEF QUEST_AB_FIRST_MAP
+; A: run the real map renderer, but discard its LCD writes. The sprite still
+; uses its own, untouched writer. B: closing DEL uses the original map code.
+probe_first_map:
+	call ROM_LCD_CLS
+	ld hl,probe_skip_map_byte
+	ld (blit_map_write_call+1),hl
+	call redraw_chunk
+	ld hl,x_ram_write_fast_atomic
+	ld (blit_map_write_call+1),hl
+	jp draw_player
+probe_skip_map_byte:
+	xor a			; Same success flag as a completed write.
+	ret
+	ds 59-($-blit_buf_range_to_lcd_diff_once),0 ; Original unused routine's footprint.
+	ELSE
 	call music_render_begin
 	push hl
 	push de
@@ -82,6 +100,8 @@ blit_diff_abort_write:
 	jr blit_diff_abort_forward
 blit_diff_done:
 	jp music_render_end
+	ENDIF
+	ENDIF
 
 ; draw current player sprite
 draw_player:

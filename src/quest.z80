@@ -58,7 +58,9 @@ HOME_CHUNK_Y			equ 3
 HOME_PLAYER_X			equ 5*STEP_X
 HOME_PLAYER_Y			equ 1*STEP_Y
 
+	IFNDEF BUILD_LANG_EN
 BUILD_LANG_EN			equ 1 ; set to 1 for English build.
+	ENDIF
 
 INTRO_TEXT_PTR		equ intro_text
 DEBUG				equ 0
@@ -88,7 +90,30 @@ DEBUG_SKIP_RANDOM_BATTLES	equ 0
 ; Start
 ; ------------------------------------------------------------
 
+; Diagnostic build: -DQUEST_MAP_TRACE -DBUILD_LANG_EN=0
+	MACRO MAP_TRACE stage
+	IFDEF QUEST_MAP_TRACE
+	push hl
+	ld hl,diag_trace_seen
+	set stage-1,(hl)
+	inc hl
+	ld (hl),stage
+	pop hl
+	ENDIF
+	ENDM
+
+	IFDEF QUEST_MAP_TRACE
+	jr start
+diag_trace_seen:	db 0	; $2002, one bit per completed checkpoint
+diag_trace_last:	db 0	; $2003, latest checkpoint
+diag_trace_tag:	db $D7	; $2004, check before interpreting retained RAM
+	ASSERT diag_trace_seen == $2002
+	ENDIF
 start:
+	IFDEF QUEST_MAP_TRACE
+	ld hl,0
+	ld (diag_trace_seen),hl
+	ENDIF
 	xor a
 	ld (music_driver_installed),a
 	call music_reset_runtime_state
@@ -115,55 +140,23 @@ start:
 	jp nz,quit
 	call game_begin_from_title
 	ENDIF
+	IFDEF QUEST_AB_FIRST_MAP
+	call probe_first_map
+	ELSE
 	call world_redraw_map_with_player
+	ENDIF
 	IF DEBUG_SKIP_STARTUP_MUSIC
 	call music_start_map
 	ENDIF
 
 main:
 	; Quit if ON/BREAK
+	MAP_TRACE 3
 	call game_break_poll_pending
 	jp nz,quit
 	ld a,(SYS_BREAKFLAG)
 	bit 7,a
 	jp nz,quit
-
-	ld a,(redraw_active)
-	or a
-	jr z,main_music_poll
-	call redraw_step
-	call game_break_pending
-	jp nz,quit
-	ld a,(redraw_active)
-	or a
-	call nz,redraw_step
-	call game_break_pending
-	jp nz,quit
-	ld a,(redraw_active)
-	or a
-	call nz,redraw_step
-	call game_break_pending
-	jp nz,quit
-	ld a,(redraw_active)
-	or a
-	call nz,redraw_step
-	call game_break_pending
-	jp nz,quit
-	call music_update
-	ld a,(redraw_active)
-	or a
-	jr nz,main
-	call draw_player
-	ld a,(post_move_pending)
-	or a
-	jr z,main
-	xor a
-	ld (post_move_pending),a
-	call check_tile_event
-	or a
-	jr nz,main
-	call check_random_battle
-	jr main
 
 main_music_poll:
 	call music_update
@@ -172,11 +165,13 @@ main_music_poll:
 	jr nz,main
 
 main_poll_input:
+	MAP_TRACE 6
 	ld a,T6834_STICK_CMD
 	ld bc,1
 	ld de,SYS_T6834_REPLYBUF
 	call ROM_T6834_CMD_PARAM
 
+	MAP_TRACE 7
 	ld a,(SYS_T6834_REPLYBUF)
 	cp T6834_STICK_NONE
 	jp z,main
@@ -216,9 +211,6 @@ moved	equ $+1
 	ld a,0
 	or a
 	jp z,main
-	ld a,(redraw_active)
-	or a
-	jp nz,main
 	call check_tile_event
 	or a
 	jp nz,main
@@ -228,9 +220,7 @@ moved	equ $+1
 quit_cleanup:
 	di
 	xor a
-	ld (redraw_active),a
 	ld (music_render_active),a
-	ld (post_move_pending),a
 	call music_stop
 	call music_restore_system_state
 	ld a,T6834_CMD_KEYBUF_CLEAR
@@ -264,3 +254,6 @@ quit:
 	include "stats.inc"
 
 program_end:
+	IFDEF QUEST_MAP_TRACE
+	ASSERT program_end <= $3F00
+	ENDIF

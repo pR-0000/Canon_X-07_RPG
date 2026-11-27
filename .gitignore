@@ -1,0 +1,7 @@
+# Local hardware diagnostics, prototypes, and tool caches
+/.local/
+__pycache__/
+*.pyc
+*.tiled-session
+*.sym
+*.lst
